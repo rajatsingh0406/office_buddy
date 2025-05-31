@@ -22,4 +22,5 @@ class AppConstant {
   static const refreshToken = '$baseUrl/token/refresh/';
 
   static const feedPost = '$dynamicBaseUrl/Post/';
+  static const calendar = '$dynamicBaseUrl/Event/';
 }

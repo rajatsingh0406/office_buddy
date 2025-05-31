@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:office_buddy/src/core/api/app_constant.dart';
 import 'package:office_buddy/src/core/shared_pref/shared_preference.dart';
+import 'package:office_buddy/src/presentation/calendar/calendar_page.dart';
 import 'package:office_buddy/src/presentation/core/string/app_string.dart';
 import 'package:office_buddy/src/presentation/core/widget/custom_cache_image.dart';
 import 'package:office_buddy/src/presentation/home/home_screen.dart';
@@ -35,7 +36,7 @@ class _LandingScreenState extends State<LandingScreen> {
       body: IndexedStack(
         index: currentPageIndex,
         children: const [
-          Center(child: Text("data 1 ")),
+          CalendarPage(),
           HomeScreen(),
           Center(child: Text("datadatadata 3")),
         ],
