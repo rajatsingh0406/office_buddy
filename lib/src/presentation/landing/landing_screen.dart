@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:office_buddy/src/core/api/app_constant.dart';
 import 'package:office_buddy/src/core/shared_pref/shared_preference.dart';
 import 'package:office_buddy/src/presentation/calendar/calendar_page.dart';
 import 'package:office_buddy/src/presentation/core/string/app_string.dart';
 import 'package:office_buddy/src/presentation/core/widget/custom_cache_image.dart';
 import 'package:office_buddy/src/presentation/home/home_screen.dart';
+import 'package:office_buddy/src/presentation/profile/profile_screen.dart';
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
@@ -19,7 +19,6 @@ class _LandingScreenState extends State<LandingScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     loadUserImage();
 
@@ -38,7 +37,7 @@ class _LandingScreenState extends State<LandingScreen> {
         children: const [
           CalendarPage(),
           HomeScreen(),
-          Center(child: Text("datadatadata 3")),
+          ProfileScreen(),
         ],
       ),
       bottomNavigationBar: Container(
@@ -68,6 +67,7 @@ class _LandingScreenState extends State<LandingScreen> {
               ),
               activeIcon: Image.asset(
                 'images/calendar.png',
+                color: Color(0XFF1E40AF),
                 height: 25.sp,
                 width: 25.sp,
               ),
@@ -77,6 +77,7 @@ class _LandingScreenState extends State<LandingScreen> {
               icon: Image.asset('images/home.png', height: 25.sp, width: 25.sp),
               activeIcon: Image.asset(
                 'images/home.png',
+                color: Color(0XFF1E40AF),
                 height: 25.sp,
                 width: 25.sp,
               ),
@@ -89,6 +90,15 @@ class _LandingScreenState extends State<LandingScreen> {
                   height: 30.h,
                   width: 30.h,
                 ),
+              ),
+              activeIcon: ClipOval(
+                child: CustomCacheImage(
+                  imageUrl: userImage?? AppString.defaultImage,
+                  height: 30.h,
+                  width: 30.h,
+                  color: Color(0XFF1E40AF)
+                ),
+                
               ),
               label: 'Profile',
             ),

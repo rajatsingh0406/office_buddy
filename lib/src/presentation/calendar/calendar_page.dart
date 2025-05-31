@@ -216,10 +216,9 @@ class _CalendarPageState extends State<CalendarPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Event Calendar'),
-        backgroundColor:Color(0xfff1e40af),
-        foregroundColor: Colors.white,
-        elevation: 0,
+        backgroundColor: Color(0xff1E40AF),
+        leadingWidth: 120,
+        leading: Image.asset('images/app_logo.png'),
       ),
       body: Column(
         children: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:office_buddy/src/data/model/post/feed_model.dart';
 import 'package:office_buddy/src/data/repositories/feed_repositories.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:office_buddy/src/presentation/core/widget/custom_cache_image.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(title: const Text('Home')),
       body: FutureBuilder<List<FeedModel>>(
@@ -35,13 +37,15 @@ class _HomeScreenState extends State<HomeScreen> {
           }
 
           final feeds = snapshot.data!;
+          
           return ListView.builder(
             itemCount: feeds.length,
             itemBuilder: (context, index) {
               final feed = feeds[index];
+              debugPrint('this is the ${feed.media}');
               return ListTile(
                 title: Html(data: feed.description?.html ?? 'No Title'),
-                subtitle: Html(data: feed.description?.html ?? 'No Title'),
+                subtitle: CustomCacheImage(imageUrl: feed.media??'http://192.168.1.42:8001/media/imagedata/user/Screenshot_2025-05-26_at_4.54.04PM.png',height: 200),
               );
             },
           );

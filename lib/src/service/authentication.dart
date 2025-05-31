@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:office_buddy/src/core/api/api_provider.dart';
 import 'package:office_buddy/src/core/api/app_constant.dart';
 import 'package:office_buddy/src/core/utils/shared_preference.dart';
@@ -173,6 +174,43 @@ class Authentication {
     }
   }
 
+   Future<void> userSignOut(context) async {
+    // final GoogleSignIn googleSignIn = GoogleSignIn();
+    final sessionId = await PrefManager.getUserSessionId();
+    final csrf = await PrefManager.getUserCsrfToken();
+
+    // if (await googleSignIn.isSignedIn()) {
+    //   try {
+    //     await googleSignIn.disconnect();
+    //   } catch (disconnectError) {
+    //     Logger.logError('Google disconnect failed: $disconnectError');
+    //     // Proceed even if disconnect fails, as signOut will suffice
+    //   }
+    //   await googleSignIn.signOut();
+    // }
+    // await FirebaseAuth.instance.signOut();
+    // await googleSignIn.signOut();
+    final response = await ApiProvider.getDio().post(
+      AppConstant.signOut,
+      // options: Options(headers: {
+      //   'Cookie': 'sessionid=$sessionId;csrftoken=$csrf',
+      //   'X-CSRFToken': csrf,
+      //   'Referer': AppConstant.signOut,
+      //   'Content-Type': AppConstant.signOut
+      // }),
+    );
+    if (response.statusCode == 200) {
+      PrefManager.clearPreferences();
+
+     Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()));
+      Fluttertoast.showToast(msg: 'User Logged out successfully');
+    } else {
+      Fluttertoast.showToast(msg: 'User Logged out failed');
+    }
+  }
+
   void _navigateToLanding(context) {
     Navigator.pushReplacement(
           context,
@@ -181,6 +219,7 @@ class Authentication {
   }
 
   Future<void> _handleLogout(context) async {
+    userSignOut(context);
     // await FirebaseAuth.instance.signOut();
     // PrefManager.clearPreferences();
     // AppRouter.navigateTo(
@@ -190,8 +229,8 @@ class Authentication {
     //   transitionDuration: const Duration(milliseconds: 600),
     // );
 
-    Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginScreen()));
+    // Navigator.pushReplacement(
+    //       context,
+    //       MaterialPageRoute(builder: (context) => LoginScreen()));
   }
 }
