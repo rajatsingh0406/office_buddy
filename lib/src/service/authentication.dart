@@ -8,6 +8,7 @@ import 'package:office_buddy/src/core/utils/shared_preference.dart';
 import 'package:office_buddy/src/data/model/login/login_model.dart'
     as pmg_model;
 import 'package:office_buddy/src/presentation/landing/landing_screen.dart';
+import 'package:office_buddy/src/presentation/login/login_screen.dart';
 
 class Authentication {
   final Dio _dio;
@@ -57,7 +58,7 @@ class Authentication {
       debugPrint("this is the response data--->>>$loginData");
       final pmgId = loginData.user?.id ?? '';
       final pmgUserFullname = loginData.user?.name ?? '';
-      final pmgUserProfileUrl = loginData.user?.profilePic ?? '';
+      final pmgUserProfileUrl = loginData.user?.dp ?? '';
       final pmgUserEmail = loginData.user?.email ?? '';
       final accessToken = loginData.tokens?.access ?? '';
       final refreshToken = loginData.tokens?.refresh ?? '';
@@ -95,5 +96,102 @@ class Authentication {
       debugPrint("Error sending access token: ${e.toString()}");
       debugPrint("Stack trace: $stackTrace");
     }
+  }
+
+  void navigate(context) async {
+    final isLoggedIn = await PrefManager.getLoggedInStatus();
+    if (isLoggedIn) {
+      await checkSessionValidity(context);
+    } else {
+      debugPrint("the seseion is not validate");
+      Future.delayed(const Duration(seconds: 3), () {
+         Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      });
+    }
+  }
+
+
+   Future<bool> checkSessionValidity(context) async {
+    try {
+      final accessToken = await PrefManager.getUserAccessToken();
+      final refreshToken = await PrefManager.getUserRefreshToken();
+
+      debugPrint('Access Token: $accessToken');
+      debugPrint('Refresh Token: $refreshToken');
+
+      // If access token is available, verify it
+      if (accessToken != null && accessToken.isNotEmpty) {
+        final response = await _dio.post(
+          AppConstant.verifyToken,
+          data: jsonEncode({"token": accessToken}),
+        );
+
+        if (response.statusCode == 200) {
+          ApiProvider.setAccessToken(accessToken);
+          _navigateToLanding(context);
+          return true;
+        } else if (response.statusCode == 400) {
+          // Try refreshing the token
+          final refreshResponse = await _dio.post(
+            AppConstant.refreshToken,
+            data: jsonEncode({'refresh': refreshToken}),
+          );
+
+          if (refreshResponse.statusCode == 200) {
+            final newAccessToken = response.data['access'];
+            final newRefreshToken = response.data['refresh'];
+
+            debugPrint('new access token ---$newAccessToken');
+            debugPrint('new refresh token ---$newRefreshToken');
+
+            PrefManager.setUserAccessToken(newAccessToken);
+            PrefManager.setUserRefreshToken(newRefreshToken);
+
+            ApiProvider.setAccessToken(newAccessToken);
+            _navigateToLanding(context);
+            return true;
+          } else {
+            await _handleLogout(context);
+            return false;
+          }
+        }
+      }
+
+      // If access token is null or empty
+      await _handleLogout(context);
+      return false;
+    } catch (e) {
+      if (e is DioException && e.response?.statusCode == 403) {
+        await _handleLogout(context);
+      } else {
+        debugPrint('Unknown error during session check: $e');
+      }
+      return false;
+    }
+  }
+
+  void _navigateToLanding(context) {
+    Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LandingScreen()));
+   
+  }
+
+  Future<void> _handleLogout(context) async {
+    // await FirebaseAuth.instance.signOut();
+    // PrefManager.clearPreferences();
+    // AppRouter.navigateTo(
+    //   AppRoutes.loginRoute.route,
+    //   clearStack: true,
+    //   transition: TransitionType.inFromLeft,
+    //   transitionDuration: const Duration(milliseconds: 600),
+    // );
+
+    Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()));
   }
 }
